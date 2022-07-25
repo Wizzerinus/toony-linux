@@ -1,0 +1,10 @@
+Games:
+  CorporateClash:
+    prefix: "~/.wine"
+    api_path: "https://corporateclash.net/api/v1/login/"
+    gameserver: "https://gs.corporateclash.net"
+    default_district: "Seltzer Summit"
+
+  ToontownRewritten:
+    prefix: "~/.ttr"
+    api_path: "https://www.toontownrewritten.com/api/login?format=json"
