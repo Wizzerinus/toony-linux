@@ -2,7 +2,7 @@ import os
 import subprocess
 from glob import glob
 
-from code.common import Handler
+from code.common import Config, Handler
 
 
 class WindowsHandler(Handler):
@@ -17,13 +17,15 @@ class WindowsHandler(Handler):
 
         raise ValueError('File not found')
 
-    def launch(self, path, env=None, cwd='', pipe_stderr=True, pipe_stdout=True, **kwargs):
+    def launch(self, path, env=None, cwd=None, pipe_stderr=True, pipe_stdout=True, **kwargs):
         env = env or {}
 
-        args = dict(env=dict(os.environ, **env), cwd=cwd)
+        args = dict(env=dict(os.environ, **env))
+        if cwd is not None:
+            args['cwd'] = cwd
         if pipe_stderr:
             args['stderr'] = subprocess.PIPE
         if pipe_stdout:
             args['stdout'] = subprocess.PIPE
 
-        self.app = subprocess.Popen(['wine', path], **args)
+        self.app = subprocess.Popen([Config().Handlers.Windows.wine_executable, path], **args)

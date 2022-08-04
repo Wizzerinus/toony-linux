@@ -2,6 +2,7 @@ account1:
   game: clash
   login: login1  # only one account with this combination of (game, login) can be launched simultaneously
   # (the shell errors out unless force=true is passed)
+  # IMPORTANT: read "Disclaimer: Password Encryption" in README.md
   password: password1  # not setting this will let you enter the password before launching
   display_name: My Favourite Toon
   aliases: ['1']  # lc 1 or lc account1 will both launch the game

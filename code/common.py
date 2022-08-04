@@ -121,6 +121,10 @@ class Game(abc.ABC):
     def update(self):
         pass
 
+    def stop(self):
+        self.handler.app.kill()
+        self.handler.app = None
+
 
 class UpdaterFile:
     def __init__(self, path: str, filename: str, file_hash: str, archive_hash: str,

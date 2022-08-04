@@ -64,6 +64,7 @@ class ToonLinuxShell(Cmd):
         self.update_prompt()
 
         self.do_lc = self.do_launch
+        self.do_dc = self.do_disconnect
         self.do_ds = self.do_district
 
     def update_prompt(self):
@@ -111,8 +112,15 @@ class ToonLinuxShell(Cmd):
         self.load_toons()
 
     def do_update(self, arg):
-        for game in self.games.values():
-            game().update()
+        if not arg:
+            print('Updating all games')
+            for game in self.games.values():
+                game().update()
+        elif arg in self.games:
+            print(f'Updating single game: {arg}')
+            self.games[arg]().update()
+        else:
+            print(f'Unknown game {arg}')
 
     def do_launch(self, arg):
         self.filter_accounts()
@@ -152,6 +160,19 @@ class ToonLinuxShell(Cmd):
 
             print(f'Successfully logged in as {toon_name}')
             self.launched_games[account['game'], account['login']] = game
+
+    def do_disconnect(self, arg):
+        if arg not in self.accounts:
+            print(f'Account {arg} not found')
+            return
+
+        account = self.accounts[arg]
+        game = self.launched_games.get((account['game'], account['login']))
+        if not game or not game.is_active():
+            print(f'Account {arg} not launched')
+            return
+
+        game.stop()
 
     def do_district(self, arg):
         self.clash_district = self.convert_district(arg)

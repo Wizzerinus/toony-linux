@@ -8,3 +8,7 @@ Games:
   ToontownRewritten:
     prefix: "~/.ttr"
     api_path: "https://www.toontownrewritten.com/api/login?format=json"
+
+Handlers:
+  Windows:
+    wine_executable: "wine"
