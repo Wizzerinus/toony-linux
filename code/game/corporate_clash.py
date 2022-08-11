@@ -1,4 +1,6 @@
+import datetime
 import json
+from getpass import getpass
 
 import requests
 
@@ -11,10 +13,15 @@ from code.shell import ToonLinuxShell
 class CorporateClash(Game):
     force_account = ''
 
-    def __init__(self):
+    def __init__(self, account):
         self.handler = WindowsHandler('CorporateClash.exe')
-        super().__init__('CorporateClash')
+        self.token = None
+        super().__init__('CorporateClash', account)
         self.updater = ClashPatcher(self.game_directory)
+
+    @staticmethod
+    def get_headers(**kwargs):
+        return dict(kwargs, **{'user-agent': 'Toony Linux 0.2 by Wizzerinus'})
 
     def update(self):
         self.updater.run()
@@ -24,13 +31,54 @@ class CorporateClash(Game):
             self.force_account = toon_position
         return super().login(login, password, **kwargs)
 
+    def process_lt(self, ignored, **kwargs):
+        if 'password' in self.account:
+            password = self.account['password']
+            print('Using password from the old login configuration.')
+        else:
+            password = getpass(f'You do not have a login token registered for username {self.username}. '
+                               f'Enter your password here: ')
+        if not password:
+            return LoginState.Rejected, False
+
+        current_date = datetime.datetime.now().strftime('%Y-%m-%d')
+        request = dict(username=self.username, password=password, friendly=f'Toony Linux {current_date}')
+        response = requests.post(
+            self.config.token_api, data=request, headers=self.get_headers()).json()
+
+        if not response['status']:
+            if response.get('toonstep'):
+                print('Two-factor authentication detected. Authorize your token (id: %d) and try again.'
+                      % response['id'])
+            else:
+                print('Login failed: %s (%d)' % (response['message'], response['reason']))
+            return LoginState.Rejected, False
+
+        print('Successfully obtained the token!')
+        self.account['token'] = self.token = response['token']
+        self.account.pop('password', None)
+        self.account_needs_change = True
+        return LoginState.Offline, True
+
     def process_offline(self):
-        api_path = self.config.api_path + self.username
-        response = requests.post(api_path, data={'password': self.password}).json()
+        if not self.token:
+            return LoginState.LoginToken, True
+        response = requests.post(
+            self.config.login_api, headers=self.get_headers(Authorization=f'Bearer {self.token}')).json()
+        if response.get('bad_token'):
+            print('Your token has been revoked. Removing it from the configuration.')
+            del self.account['token']
+            self.account_needs_change = True
+            return LoginState.Rejected, False
+
         if response['status']:
             return LoginState.Online, response['token']
 
-        print('Login failed:', response['friendlyreason'])
+        if response.get('toonstep'):
+            print('Two-factor authentication detected. Authorize your token and try again.')
+            return LoginState.Rejected, False
+
+        print('Login failed:', response['message'])
         return LoginState.Rejected, False
 
     def start_game(self, data, clash_district='', **kwargs):
@@ -40,6 +88,23 @@ class CorporateClash(Game):
             FORCE_TOON_SLOT=self.force_account,
             FORCE_DISTRICT=clash_district,
         ), **kwargs)
+
+    def revoke_token(self, token):
+        if not token:
+            print('This account has no token!')
+            return
+
+        response = requests.post(
+            self.config.login_api, headers=self.get_headers(Authorization=f'Bearer {token}')).json()
+        if response.get('bad_token'):
+            print('This token does not exist.')
+            return False
+
+        if not response['success']:
+            print('Unknown error revoking the token!')
+            return False
+
+        return True
 
 
 class ClashPatcher(Updater):

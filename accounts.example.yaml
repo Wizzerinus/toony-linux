@@ -2,8 +2,9 @@ account1:
   game: clash
   login: login1  # only one account with this combination of (game, login) can be launched simultaneously
   # (the shell errors out unless force=true is passed)
-  # IMPORTANT: read "Disclaimer: Password Encryption" in README.md
-  password: password1  # not setting this will let you enter the password before launching
+  # Clash does not support password logins, you'll need to generate the token when launching
+  # you can set your password here as well, it will be read and deleted on first successful login
+  # if password is not set here, will be read from keyboard instead (using getpass())
   display_name: My Favourite Toon
   aliases: ['1']  # lc 1 or lc account1 will both launch the game
   toon_position: '2'  # 1-3 is the top row, 4-6 is the bottom row, have to be strings, only supported on Clash
@@ -11,5 +12,7 @@ account1:
 ttr:
   game: rewritten
   login: login1  # even though this is the same as account1, it will be launched separately because it's a diff game
+  # IMPORTANT: read "Disclaimer: Password Encryption" in README.md
+  password: password1  # not setting this will let you enter the password before launching, recommended for security
   display_name: Field Office Grinder
   aliases: ['fo']

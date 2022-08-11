@@ -1,4 +1,4 @@
-# Toony Linux
+# Toony Linux (v0.2)
 
 A minimalistic Linux launcher for Toontown Rewritten and Toontown: Corporate Clash.
 
@@ -14,6 +14,11 @@ A minimalistic Linux launcher for Toontown Rewritten and Toontown: Corporate Cla
 * Optional: `ds <district>` to set the district for newly-spawned Clash toons.
 
 ### Disclaimer: Password encryption
+
+***Note from 08/11/2022:*** Toontown: Corporate Clash implemented the token system and deprecated
+password logins, so this does not apply to the server. It still applies to Toontown Rewritten, though.
+***
+
 As most Toontown login servers do not support login systems using 
 asymmetric encryption algorithms, the passwords have to be stored in plain text.
 This is a security risk. You can override this by *not setting your password*, which
@@ -22,7 +27,7 @@ easy enough to check that I do not do more with your passwords than it is requir
 in, however, damage can be caused by people other than you opening the `accounts.yml` file.
 
 **I am not responsible** for any damage caused by the plaintext password interface.
-**You have been warned.** If you want better security, do not set the password in the file and enter it at login. 
+**You have been warned.** If you want better security, do not set the password in the file and enter it at login.
 
 ## TODO
 

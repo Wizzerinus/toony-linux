@@ -87,6 +87,15 @@ class ToonLinuxShell(Cmd):
                     for alias in account['aliases']:
                         self.accounts[alias] = account
 
+    def save_accounts(self):
+        accounts = dict(self.accounts)
+        for login, account in self.accounts.items():
+            if login in account.get('aliases', []):
+                del accounts[login]
+
+        with open('accounts.yaml', 'w') as f:
+            yaml.dump(accounts, f)
+
     def extract_kwargs(self, arg):
         args, kwargs = [], {}
         for arg in arg.split():
@@ -115,12 +124,28 @@ class ToonLinuxShell(Cmd):
         if not arg:
             print('Updating all games')
             for game in self.games.values():
-                game().update()
+                game(None).update()
         elif arg in self.games:
             print(f'Updating single game: {arg}')
-            self.games[arg]().update()
+            self.games[arg](None).update()
         else:
             print(f'Unknown game {arg}')
+
+    def do_notoken(self, arg):
+        if arg not in self.accounts:
+            print(f'Account {arg} not found')
+            return
+
+        account = self.accounts[arg]
+        if account['game'] != 'clash':
+            print('Revoking non-clash tokens is not yet supported.')
+            return
+
+        game = self.games[account['game']]()
+        result = game.revoke_token(account.get('token'))
+        if result:
+            del account['token']
+            self.save_accounts()
 
     def do_launch(self, arg):
         self.filter_accounts()
@@ -138,11 +163,11 @@ class ToonLinuxShell(Cmd):
                       '(use force=true to override)')
                 continue
 
-            game = self.games[account['game']]()
+            game = self.games[account['game']](account)
             toon_name = account['display_name']
 
             password_reset = False
-            if 'password' not in account:
+            if 'password' not in account and Config().GameData[account['game']].uses_password:
                 password_reset = True
                 account['password'] = getpass(f'Enter password for {toon_name}: ')
 
@@ -150,6 +175,7 @@ class ToonLinuxShell(Cmd):
                 kwargs['clash_district'] = self.clash_district
             else:
                 kwargs['clash_district'] = self.convert_district(kwargs['clash_district'])
+
             login_successful = game.login(**account, **kwargs)
             if not login_successful:
                 if password_reset:
@@ -157,6 +183,9 @@ class ToonLinuxShell(Cmd):
                 continue
             if password_reset:
                 print('Saving password for this account for the rest of this session')
+            elif game.account_needs_change:
+                print('Saving the account...')
+                self.save_accounts()
 
             print(f'Successfully logged in as {toon_name}')
             self.launched_games[account['game'], account['login']] = game

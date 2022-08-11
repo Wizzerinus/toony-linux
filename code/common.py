@@ -15,6 +15,7 @@ class LoginState(Enum):
     Queue = 'queued'
     Online = 'online'
     Rejected = 'rejected'
+    LoginToken = 'lt'
 
 
 class Subconfig:
@@ -65,11 +66,13 @@ class Game(abc.ABC):
     path = None
     username = password = None
 
-    def __init__(self, game_name):
+    def __init__(self, game_name, account):
         if not self.handler:
             raise ValueError('Handler not set')
 
         self.config = Config().Games[game_name]
+        self.account = account
+        self.account_needs_change = False
         prefix = os.path.expanduser(self.config.prefix)
         self.path = self.handler.find(prefix)
         self.game_directory = os.path.dirname(self.path)

@@ -13,9 +13,9 @@ from code.shell import ToonLinuxShell
 
 @ToonLinuxShell.game('rewritten')
 class ToontownRewritten(Game):
-    def __init__(self):
+    def __init__(self, account):
         self.handler = NativeHandler('TTREngine')
-        super().__init__('ToontownRewritten')
+        super().__init__('ToontownRewritten', account)
         self.updater = RewrittenUpdater(self.game_directory)
 
     def process_offline(self) -> Tuple[LoginState, Any]:
