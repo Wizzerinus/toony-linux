@@ -26,10 +26,13 @@ class CorporateClash(Game):
     def update(self):
         self.updater.run()
 
-    def login(self, login: str, password: str, toon_position: int = 6, **kwargs) -> bool:
+    def login(self, login: str, token: str = '', toon_position: int = 6, **kwargs) -> bool:
         if toon_position != 6:
             self.force_account = toon_position
-        return super().login(login, password, **kwargs)
+        self.token = token
+        if 'password' not in kwargs:
+            kwargs['password'] = ''
+        return super().login(login, **kwargs)
 
     def process_lt(self, ignored, **kwargs):
         if 'password' in self.account:
