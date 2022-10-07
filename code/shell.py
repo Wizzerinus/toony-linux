@@ -30,7 +30,6 @@ class ToonLinuxShell(Cmd):
     def __init__(self):
         super().__init__()
         self.load_toons()
-        self.update_prompt()
 
         self.do_lc = self.do_launch
         self.do_dc = self.do_disconnect
