@@ -7,41 +7,10 @@ from code.common import Config
 
 
 class ToonLinuxShell(Cmd):
-    clash_district = Config().Games.CorporateClash.default_district
     accounts = None
     games = {}
     launched_games = {}
-
-    districts = {
-        'high-dive': 'High-Dive Hills',
-        'highdive': 'High-Dive Hills',
-        'high dive': 'High-Dive Hills',
-        'hills': 'High-Dive Hills',
-        'quicksand': 'Quicksand Quarry',
-        'quarry': 'Quicksand Quarry',
-        'hypno': 'Hypno Heights',
-        'heights': 'Hypno Heights',
-        'kazoo': 'Kazoo Kanyon',
-        'kanyon': 'Kazoo Kanyon',
-        'seltzer': 'Seltzer Summit',
-        'summit': 'Seltzer Summit',
-        'tesla': 'Tesla Tundra',
-        'tundra': 'Tesla Tundra',
-        'cupcake': 'Cupcake Cove',
-        'cove': 'Cupcake Cove',
-        'anvil': 'Anvil Acres',
-        'acres': 'Anvil Acres',
-
-        'toon-up': 'High-Dive Hills',
-        'toonup': 'High-Dive Hills',
-        'trap': 'Quicksand Quarry',
-        'lure': 'Hypno Heights',
-        'sound': 'Kazoo Kanyon',
-        'squirt': 'Seltzer Summit',
-        'zap': 'Tesla Tundra',
-        'throw': 'Cupcake Cove',
-        'drop': 'Anvil Acres',
-    }
+    prompt = "ToonLinux> "
 
     value_replacements = {
         'true': True,
@@ -65,11 +34,6 @@ class ToonLinuxShell(Cmd):
 
         self.do_lc = self.do_launch
         self.do_dc = self.do_disconnect
-        self.do_ds = self.do_district
-
-    def update_prompt(self):
-        small_district = self.clash_district.split(' ')[0]
-        self.prompt = f'\n[{small_district}] ToonLinux> '
 
     def emptyline(self):
         pass
@@ -171,11 +135,6 @@ class ToonLinuxShell(Cmd):
                 password_reset = True
                 account['password'] = getpass(f'Enter password for {toon_name}: ')
 
-            if 'clash_district' not in kwargs:
-                kwargs['clash_district'] = self.clash_district
-            else:
-                kwargs['clash_district'] = self.convert_district(kwargs['clash_district'])
-
             login_successful = game.login(**account, **kwargs)
             if not login_successful:
                 if password_reset:
@@ -202,13 +161,6 @@ class ToonLinuxShell(Cmd):
             return
 
         game.stop()
-
-    def do_district(self, arg):
-        self.clash_district = self.convert_district(arg)
-        self.update_prompt()
-
-    def convert_district(self, dist):
-        return self.districts.get(dist, dist)
 
     # TODO: figure out why this does not work
     """

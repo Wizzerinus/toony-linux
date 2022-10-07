@@ -84,12 +84,11 @@ class CorporateClash(Game):
         print('Login failed:', response['message'])
         return LoginState.Rejected, False
 
-    def start_game(self, data, clash_district='', **kwargs):
+    def start_game(self, data, **kwargs):
         self.launch(dict(
             TT_GAMESERVER=self.config.gameserver,
             TT_PLAYCOOKIE=data,
             FORCE_TOON_SLOT=self.force_account,
-            FORCE_DISTRICT=clash_district,
         ), **kwargs)
 
     def revoke_token(self, token):
