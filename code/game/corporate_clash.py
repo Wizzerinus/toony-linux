@@ -121,8 +121,8 @@ class CorporateClash(Game):
 class ClashPatcher(Updater):
     updater_name = 'Corporate Clash Updater'
     manifest_files = [
-        'https://corporateclash.net/api/v1/launcher/manifest/v2/windows_production.js',
-        'https://corporateclash.net/api/v1/launcher/manifest/v2/resources_production.js',
+        'https://corporateclash.net/api/v1/launcher/manifest/v3/production/windows',
+        'https://corporateclash.net/api/v1/launcher/manifest/v3/production/resources',
     ]
 
     update_url = 'https://aws1.corporateclash.net/productionv2/'

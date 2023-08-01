@@ -3,7 +3,7 @@ Games:
     prefix: "~/.wine"
     token_api: "https://corporateclash.net/api/launcher/v1/register"
     login_api: "https://corporateclash.net/api/launcher/v1/login"
-    gameserver: "https://gs.corporateclash.net"
+    gameserver: "https://gs-prd.corporateclash.net"
 
   ToontownRewritten:
     prefix: "~/.ttr"
