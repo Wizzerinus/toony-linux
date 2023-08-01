@@ -3,6 +3,7 @@ import json
 from getpass import getpass
 
 import requests
+from requests import JSONDecodeError
 
 from code.common import Game, LoginState, Updater, UpdaterFile
 from code.handler.windows_handler import WindowsHandler
@@ -66,8 +67,13 @@ class CorporateClash(Game):
     def process_offline(self):
         if not self.token:
             return LoginState.LoginToken, True
-        response = requests.post(
-            self.config.login_api, headers=self.get_headers(Authorization=f'Bearer {self.token}')).json()
+        try:
+            response = requests.post(
+                self.config.login_api, headers=self.get_headers(Authorization=f'Bearer {self.token}')).json()
+        except JSONDecodeError:
+            print('ISP consumed the JSON output, retrying...')
+            return LoginState.Offline, True
+
         if response.get('bad_token'):
             print('Your token has been revoked. Removing it from the configuration.')
             del self.account['token']
@@ -81,6 +87,9 @@ class CorporateClash(Game):
             print('Two-factor authentication detected. Authorize your token and try again.')
             return LoginState.Rejected, False
 
+        if 'A lot of Toons' in response['message']:
+            print("We're rate limited, retrying...")
+            return LoginState.Offline, True
         print('Login failed:', response['message'])
         return LoginState.Rejected, False
 
