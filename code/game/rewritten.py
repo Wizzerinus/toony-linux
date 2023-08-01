@@ -59,8 +59,8 @@ class ToontownRewritten(Game):
             TTR_PLAYCOOKIE=data['cookie'],
         ), **kwargs)
 
-    def update(self):
-        self.updater.run()
+    def update(self, force: bool = False):
+        self.updater.run(force)
 
 
 class RewrittenUpdater(Updater):

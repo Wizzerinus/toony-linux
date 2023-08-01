@@ -121,7 +121,7 @@ class Game(abc.ABC):
     def launch(self, env: dict = None, **kwargs):
         self.handler.launch(self.path, env, cwd=self.game_directory, **kwargs)
 
-    def update(self):
+    def update(self, force: bool = False):
         pass
 
     def stop(self):
@@ -161,14 +161,14 @@ class Updater(abc.ABC):
         for manifest_file in self.manifest_files:
             self.get_partial_manifest(manifest_file)
 
-    def check_local_files(self, debug: bool = False):
+    def check_local_files(self, force: bool = False, debug: bool = False):
         for file in self.patch_manifest:
             full_path = self.game_directory + file.path
 
             if os.path.exists(full_path):
                 file_hash = self.sha1_hash_file(full_path)
 
-                if file_hash == file.file_hash:
+                if file_hash == file.file_hash and not force:
                     continue
 
             if debug:
@@ -285,13 +285,13 @@ class Updater(abc.ABC):
         self.patch_manifest.clear()
         self.files_needed.clear()
 
-    def run(self):
+    def run(self, force: bool = False):
         print('')
         print(self.updater_name)
         print('Fetching new patch manifest')
         self.get_patch_manifest()
         print('Checking local files for inconsistencies')
-        self.check_local_files(True)
+        self.check_local_files(force, True)
         print('Downloading updated game files')
         self.download_game_files()
         print('Patching local game files')

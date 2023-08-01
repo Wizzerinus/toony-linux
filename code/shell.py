@@ -84,15 +84,18 @@ class ToonLinuxShell(Cmd):
         self.load_toons()
 
     def do_update(self, arg):
-        if not arg:
+        games, kwargs = self.extract_kwargs(arg)
+        if not games:
             print('Updating all games')
             for game in self.games.values():
-                game(None).update()
-        elif arg in self.games:
-            print(f'Updating single game: {arg}')
-            self.games[arg](None).update()
+                game(None).update(force=kwargs.get("force", False))
         else:
-            print(f'Unknown game {arg}')
+            for arg in games:
+                if arg in self.games:
+                    print(f'Updating single game: {arg}')
+                    self.games[arg](None).update(force=kwargs.get("force", False))
+                else:
+                    print(f'Unknown game {arg}')
 
     def do_notoken(self, arg):
         if arg not in self.accounts:

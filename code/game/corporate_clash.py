@@ -23,8 +23,8 @@ class CorporateClash(Game):
     def get_headers(**kwargs):
         return dict(kwargs, **{'user-agent': 'Toony Linux 0.2 by Wizzerinus'})
 
-    def update(self):
-        self.updater.run()
+    def update(self, force: bool = False):
+        self.updater.run(force)
 
     def login(self, login: str, token: str = '', toon_position: int = 6, **kwargs) -> bool:
         if toon_position != 6:
