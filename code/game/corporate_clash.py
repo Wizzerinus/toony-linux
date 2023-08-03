@@ -1,6 +1,7 @@
 import datetime
 import json
 from getpass import getpass
+import time
 
 import requests
 from requests import JSONDecodeError
@@ -9,6 +10,8 @@ from code.common import Game, LoginState, Updater, UpdaterFile
 from code.handler.windows_handler import WindowsHandler
 from code.shell import ToonLinuxShell
 
+
+CLOUDFLARE_CAPTCHA = '<!doctype html><html lang="en-us"><head><title>just a moment...</title>'
 
 @ToonLinuxShell.game('clash')
 class CorporateClash(Game):
@@ -22,7 +25,7 @@ class CorporateClash(Game):
 
     @staticmethod
     def get_headers(**kwargs):
-        return dict(kwargs, **{'user-agent': 'Toony Linux 0.2 by Wizzerinus'})
+        return dict(kwargs, **{'user-agent': 'Toony Linux 0.2.1 by Wizzerinus'})
 
     def update(self, force: bool = False):
         self.updater.run(force)
@@ -67,11 +70,24 @@ class CorporateClash(Game):
     def process_offline(self):
         if not self.token:
             return LoginState.LoginToken, True
+        response = requests.post(
+            self.config.login_api, headers=self.get_headers(Authorization=f'Bearer {self.token}'))
         try:
-            response = requests.post(
-                self.config.login_api, headers=self.get_headers(Authorization=f'Bearer {self.token}')).json()
+            response = response.json()
         except JSONDecodeError:
-            print('ISP consumed the JSON output, retrying...')
+            if response.status_code == 429:
+                print('We are being rate limited, retrying in 15 seconds...')
+                time.sleep(15)
+                return LoginState.Offline, True
+
+            # TODO: figure out what's the best way to do this
+            if response.text.lower().startswith(CLOUDFLARE_CAPTCHA):
+                print('Cloudflare requires a captcha. Retry again later.')
+                return LoginState.Offline, False
+
+            print(response.text)
+            print('ISP consumed the JSON output, retrying in 5 seconds...')
+            time.sleep(5)
             return LoginState.Offline, True
 
         if response.get('bad_token'):
