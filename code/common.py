@@ -230,6 +230,9 @@ class Updater(abc.ABC):
         try:
             response = requests.get(url)
             stream = response.content
+            if response.status_code != 200:
+                print(f"Invalid response code: {response.status_code} from URL {url}")
+                return -1
 
             with open(filepath, 'wb') as f:
                 f.write(stream)
@@ -247,9 +250,11 @@ class Updater(abc.ABC):
         extracted_path = download_path + '~'
 
         state = self.download(url, download_path)
-
         if state != 0:
-            os.remove(download_path)
+            try:
+                os.remove(download_path)
+            except FileNotFoundError:
+                pass
             raise OSError
 
         if not self.verify(download_path, file.archive_hash):
@@ -274,13 +279,7 @@ class Updater(abc.ABC):
         for file in self.files_needed:
             local_path = self.game_directory + file.path
             local_dir = os.path.dirname(local_path)
-
-            if os.path.isdir(local_dir):
-                if os.path.isfile(local_path):
-                    os.remove(local_path)
-            else:
-                os.mkdir(local_dir)
-
+            os.makedirs(local_dir, exist_ok=True)
             os.replace(self.game_directory + file.filename, self.game_directory + file.path)
         self.patch_manifest.clear()
         self.files_needed.clear()
