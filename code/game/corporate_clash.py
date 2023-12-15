@@ -144,6 +144,7 @@ class ClashPatcher(Updater):
     update_url = 'https://aws1.corporateclash.net/productionv2/'
 
     def get_partial_manifest(self, path: str):
+        manifest_name = path.split('/')[-1]
         manifest = requests.get(path)
         if manifest.status_code != 200:
             raise ConnectionError(manifest.status_code)
@@ -151,5 +152,5 @@ class ClashPatcher(Updater):
         manifest = json.loads(manifest.text)
         for file in manifest['files']:
             self.patch_manifest.append(UpdaterFile(
-                filename=file['fileName'], path=file['filePath'], network_path=file['filePath'],
+                filename=file['fileName'], path=file['filePath'], network_path=file['filePath'] + manifest_name,
                 file_hash=file['sha1'], archive_hash=file['compressed_sha1'], hash_url=True))
