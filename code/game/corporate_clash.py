@@ -2,6 +2,7 @@ import datetime
 import json
 from getpass import getpass
 import time
+import os
 
 import requests
 from requests import JSONDecodeError
@@ -18,7 +19,9 @@ class CorporateClash(Game):
     force_account = ''
 
     def __init__(self, account):
-        self.handler = WindowsHandler('CorporateClash.exe')
+        username = os.getlogin()
+        path = f'users/{username}/AppData/Local/Corporate Clash'
+        self.handler = WindowsHandler('CorporateClash.exe', path)
         self.token = None
         super().__init__('CorporateClash', account)
         self.updater = ClashPatcher(self.game_directory)

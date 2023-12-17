@@ -84,7 +84,7 @@ class RewrittenUpdater(Updater):
                 network_path=file['dl'], algo='bzip2'
             ))
 
-    def run(self):
-        super().run()
+    def run(self, force: bool = False):
+        super().run(force)
         print('Adding execution privileges to the game executable')
         subprocess.run(['chmod', '+x', f'{self.game_directory}{os.sep}TTREngine'])

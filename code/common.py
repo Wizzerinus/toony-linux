@@ -48,8 +48,9 @@ class Config(Subconfig):
 class Handler(abc.ABC):
     app = None
 
-    def __init__(self, filename: str):
+    def __init__(self, filename: str, force_path: str = None):
         self.filename = filename
+        self.force_path = force_path
 
     @abc.abstractmethod
     def find(self, prefix: str) -> str:
