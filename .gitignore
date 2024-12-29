@@ -2,3 +2,4 @@
 accounts.yaml
 preferences.json
 resources
+__pycache__

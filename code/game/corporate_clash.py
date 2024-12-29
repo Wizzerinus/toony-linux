@@ -58,8 +58,7 @@ class CorporateClash(Game):
 
         if not response['status']:
             if response.get('toonstep'):
-                print('Two-factor authentication detected. Authorize your token (id: %d) and try again.'
-                      % response['id'])
+                print('Two-factor authentication detected. Authorize your token and try again.')
             else:
                 print('Login failed: %s (%d)' % (response['message'], response['reason']))
             return LoginState.Rejected, False
@@ -155,5 +154,5 @@ class ClashPatcher(Updater):
         manifest = json.loads(manifest.text)
         for file in manifest['files']:
             self.patch_manifest.append(UpdaterFile(
-                filename=file['fileName'], path=file['filePath'], network_path=file['filePath'] + manifest_name,
+                filename=file['fileName'], path=file['filePath'].replace("\\", "/"), network_path=file['filePath'] + manifest_name,
                 file_hash=file['sha1'], archive_hash=file['compressed_sha1'], hash_url=True))
