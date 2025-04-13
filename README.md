@@ -2,6 +2,14 @@
 
 A minimalistic Linux launcher for Toontown Rewritten and Toontown: Corporate Clash.
 
+# NOTE
+
+This repository remains in place as an API reference for any future launcher developers. However, using
+the launcher itself is not recommended, as it has caused weird thread problems (i.e. freezing
+in OCLO and less commonly VP boss rounds) and weird network problems (i.e. false-positive VPN triggers)
+for its users. In certain scenarios, the CLI also stops working if a window is launched, which renders
+the launcher effectively useless.
+
 ## Configuration
 
 * Copy `accounts.example.yaml` to `accounts.yml` and fill in your account details.
